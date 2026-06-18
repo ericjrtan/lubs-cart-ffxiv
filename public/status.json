@@ -1,0 +1,6 @@
+{
+  "latestVersion": "1.0.0",
+  "downloadUrl": "https://github.com/ericjrtan/lubs-cart-ffxiv/releases/latest",
+  "notice": null,
+  "_comment": "The app reads this on startup. Set 'notice' to a short string to show a banner to everyone (e.g. 'Universalis is down for the patch — prices may be stale'); set it back to null to clear. Bump 'latestVersion' when you publish a new release to surface an 'update available' link. No app rebuild or re-distribution needed to change this file."
+}

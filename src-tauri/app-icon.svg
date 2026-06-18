@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lub's Cart — original crystal mark (no Square Enix assets). Meteor/Warm theme. -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="72%">
+      <stop offset="0%" stop-color="#2b1822"/>
+      <stop offset="58%" stop-color="#17111a"/>
+      <stop offset="100%" stop-color="#0c0910"/>
+    </radialGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd2a6"/>
+      <stop offset="42%" stop-color="#ff8a4c"/>
+      <stop offset="100%" stop-color="#d4493f"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="22" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
+
+  <!-- warm aura behind the crystal -->
+  <ellipse cx="256" cy="262" rx="124" ry="154" fill="#ff8a4c" opacity="0.20" filter="url(#glow)"/>
+
+  <!-- crystal: elongated hexagonal shard -->
+  <g stroke="#7a2e1f" stroke-width="3" stroke-linejoin="round">
+    <polygon points="256,72 392,212 348,418 256,462 164,418 120,212" fill="url(#gem)"/>
+    <polygon points="256,72 120,212 164,418 256,462" fill="#000000" opacity="0.16" stroke="none"/>
+    <polygon points="256,72 120,212 392,212" fill="#ffffff" opacity="0.22" stroke="none"/>
+    <g stroke="#ffe6cf" stroke-width="2.5" opacity="0.55" fill="none">
+      <line x1="256" y1="72" x2="256" y2="462"/>
+      <line x1="120" y1="212" x2="392" y2="212"/>
+      <line x1="164" y1="418" x2="348" y2="418"/>
+      <line x1="256" y1="212" x2="164" y2="418"/>
+      <line x1="256" y1="212" x2="348" y2="418"/>
+    </g>
+  </g>
+
+  <!-- specular highlight -->
+  <polygon points="200,150 232,124 244,160 214,184" fill="#fffaf0" opacity="0.7"/>
+</svg>

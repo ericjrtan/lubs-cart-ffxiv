@@ -1,0 +1,10 @@
+# Normalize text files to LF in the repo (avoids CRLF churn across machines).
+* text=auto eol=lf
+
+# Binary assets — never touch line endings.
+*.png   binary
+*.ico   binary
+*.icns  binary
+*.woff2 binary
+*.svg   text eol=lf
+*.json  text eol=lf
