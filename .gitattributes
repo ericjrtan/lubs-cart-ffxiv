@@ -6,5 +6,6 @@
 *.ico   binary
 *.icns  binary
 *.woff2 binary
+*.gz    binary
 *.svg   text eol=lf
 *.json  text eol=lf

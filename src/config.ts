@@ -23,7 +23,7 @@ export const config = {
   wikiApiPath: '/mediawiki/api.php',
 
   // --- Hosted data (live layer of the live -> cached -> bundled fallback) ---
-  itemsRemoteUrl:  'https://raw.githubusercontent.com/ericjrtan/lubs-cart-ffxiv/main/public/items.json',
+  itemsRemoteUrl:  'https://raw.githubusercontent.com/ericjrtan/lubs-cart-ffxiv/main/public/items.json.gz',
   statusRemoteUrl: 'https://raw.githubusercontent.com/ericjrtan/lubs-cart-ffxiv/main/public/status.json',
 
   // --- Where friends download new versions (used by the status.json update banner) ---

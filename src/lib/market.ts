@@ -8,8 +8,12 @@ import { fetchJsonRetry } from "@/lib/http";
 import { runPool } from "@/lib/concurrency";
 import type { DataCenter, DcFreshness, ItemMarket, Listing, MarketData } from "@/lib/types";
 
-// Field allowlist (verified live): the `items.` prefix is correct for multi-item queries.
+// Field allowlist. A multi-item query returns an `items` map (use the `items.` prefix); a
+// SINGLE-item query returns a flat shape (`itemID`/`listings` at the top level). We request
+// BOTH variants so a one-item basket still gets its listings (verified live — otherwise a
+// single-item response with only `items.*` fields comes back completely empty).
 const FIELDS = [
+  // multi-item (items map)
   "items.listings.pricePerUnit",
   "items.listings.quantity",
   "items.listings.worldName",
@@ -17,6 +21,14 @@ const FIELDS = [
   "items.listings.tax",
   "items.lastUploadTime",
   "items.itemID",
+  // single-item (flat)
+  "listings.pricePerUnit",
+  "listings.quantity",
+  "listings.worldName",
+  "listings.hq",
+  "listings.tax",
+  "lastUploadTime",
+  "itemID",
   "unresolvedItems",
 ].join(",");
 

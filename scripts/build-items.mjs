@@ -15,10 +15,13 @@
 
 import { parse } from 'csv-parse/sync';
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 
 const ITEM_CSV   = 'https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/en/Item.csv';
 const MARKETABLE = 'https://universalis.app/api/v2/marketable';
-const OUT        = 'public/items.json';
+// Ship gzipped — the app fetches this and inflates it in the webview (DecompressionStream).
+// ~5x smaller transfer than raw JSON, so startup loads the item table much faster.
+const OUT        = 'public/items.json.gz';
 
 const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 
@@ -74,8 +77,13 @@ async function main() {
     count: Object.keys(items).length,
     items,
   };
-  writeFileSync(OUT, JSON.stringify(payload));
-  console.log(`Wrote ${OUT}: ${payload.count} items, version ${payload.version}.`);
+  const json = JSON.stringify(payload);
+  const gz = gzipSync(json, { level: 9 });
+  writeFileSync(OUT, gz);
+  console.log(
+    `Wrote ${OUT}: ${payload.count} items, version ${payload.version} ` +
+      `(${(gz.length / 1e6).toFixed(2)} MB gzipped from ${(json.length / 1e6).toFixed(2)} MB).`,
+  );
 }
 
 main().catch((e) => {

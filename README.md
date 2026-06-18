@@ -43,7 +43,7 @@ already on most Windows machines).
 
 ```bash
 npm install
-npm run build:items      # generate public/items.json (item name -> id table)
+npm run build:items      # generate public/items.json.gz (item name -> id table)
 npm run tauri dev        # run the app in dev mode
 npm run tauri build      # produce the distributable .exe / installer
 ```
@@ -53,7 +53,7 @@ npm run tauri build      # produce the distributable .exe / installer
 
 ## 🔄 How item data stays current
 
-The item table (`public/items.json`) is regenerated automatically by a scheduled GitHub
+The item table (`public/items.json.gz`) is regenerated automatically by a scheduled GitHub
 Action ([`.github/workflows/update-items.yml`](./.github/workflows/update-items.yml)) from
 [xivapi/ffxiv-datamining](https://github.com/xivapi/ffxiv-datamining) + the Universalis
 marketable list. New items from a patch show up on next app launch — no rebuild needed. New

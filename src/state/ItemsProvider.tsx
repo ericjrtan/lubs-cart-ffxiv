@@ -30,10 +30,21 @@ export function ItemsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/items.json")
-      .then((r) => {
-        if (!r.ok) throw new Error(`items.json → HTTP ${r.status}`);
-        return r.json() as Promise<ItemsTable>;
+    fetch("/items.json.gz")
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`items.json.gz → HTTP ${r.status}`);
+        const buf = new Uint8Array(await r.arrayBuffer());
+        // Inflate only if it's still gzip (magic bytes 1f 8b). If something upstream already
+        // applied Content-Encoding, fetch will have decompressed it — parse as-is then.
+        const isGzip = buf[0] === 0x1f && buf[1] === 0x8b;
+        let text: string;
+        if (isGzip) {
+          const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"));
+          text = await new Response(stream).text();
+        } else {
+          text = new TextDecoder().decode(buf);
+        }
+        return JSON.parse(text) as ItemsTable;
       })
       .then((table) => {
         if (cancelled) return;
