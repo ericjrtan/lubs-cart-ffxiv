@@ -1,6 +1,6 @@
 [package]
 name = "lubs-cart"
-version = "1.0.0"
+version = "1.0.1"
 description = "Lub's Cart — a FFXIV market-board shopping-list app"
 authors = ["you"]
 edition = "2021"

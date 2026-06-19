@@ -46,7 +46,7 @@ export const config = {
   hiddenDcRegions: ['NA-Cloud-DC'] as readonly string[],
 
   // --- App version (compare against status.json.latestVersion to show "update available") ---
-  appVersion: '1.0.0',
+  appVersion: '1.0.1',
 } as const;
 
 export type AppConfig = typeof config;

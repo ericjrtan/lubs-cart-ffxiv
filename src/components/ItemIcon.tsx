@@ -1,10 +1,9 @@
-// Fixed-size item icon (SPEC §10). Loads the XIVAPI icon directly as a lazy <img>: the
-// webview fetches them in parallel and caches them on disk natively (XIVAPI sends a
-// 1-year Cache-Control), so a screen full of icons stays fast. Fades in over a neutral
-// placeholder (no layout shift), and never blocks prices. Placeholder stays on error.
+// Fixed-size item icon (SPEC §10). Resolves through the Rust-backed disk cache (reliable
+// in the packaged app, where the webview won't load these external images directly), then
+// fades it in over a neutral placeholder — no layout shift, never blocks prices.
 
-import { useState } from "react";
-import { iconUrl } from "@/lib/icons";
+import { useEffect, useState } from "react";
+import { getIconSrc } from "@/lib/iconCache";
 
 interface ItemIconProps {
   icon?: number;
@@ -13,9 +12,23 @@ interface ItemIconProps {
 }
 
 export function ItemIcon({ icon, size = 32, className }: ItemIconProps) {
+  const [src, setSrc] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
-  const url = iconUrl(icon);
+
+  useEffect(() => {
+    let active = true;
+    setSrc("");
+    setLoaded(false);
+    setFailed(false);
+    if (!icon || icon <= 0) return;
+    getIconSrc(icon)
+      .then((s) => active && setSrc(s))
+      .catch(() => active && setFailed(true));
+    return () => {
+      active = false;
+    };
+  }, [icon]);
 
   return (
     <div
@@ -23,11 +36,10 @@ export function ItemIcon({ icon, size = 32, className }: ItemIconProps) {
       className={`relative shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border ${className ?? ""}`}
       aria-hidden
     >
-      {url && !failed && (
+      {src && !failed && (
         <img
-          src={url}
+          src={src}
           alt=""
-          loading="lazy"
           decoding="async"
           width={size}
           height={size}

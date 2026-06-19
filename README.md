@@ -4,7 +4,7 @@
 hand), and Lub's Cart tells you the cheapest way to buy everything across the worlds you can
 reach — grouped by data center and world, with a running total.
 
-Great for big projects like housing builds.
+Great for big projects like housing pre-builds (This is for your Mitchell)
 
 ---
 
@@ -16,7 +16,6 @@ Great for big projects like housing builds.
 2. Run it. The first time, Windows may show a blue **"Windows protected your PC"** screen
    because the app isn't code-signed — click **More info → Run anyway**. (It's safe; that
    warning just means it's from an indie dev, not a verified publisher.)
-3. That's it — no account, no setup, nothing else to install.
 
 > First launch needs internet to pull current prices and item icons; after that, item
 > icons are cached locally. Your prices always come live from Universalis.
@@ -56,8 +55,7 @@ npm run tauri build      # produce the distributable .exe / installer
 The item table (`public/items.json.gz`) is regenerated automatically by a scheduled GitHub
 Action ([`.github/workflows/update-items.yml`](./.github/workflows/update-items.yml)) from
 [xivapi/ffxiv-datamining](https://github.com/xivapi/ffxiv-datamining) + the Universalis
-marketable list. New items from a patch show up on next app launch — no rebuild needed. New
-**worlds** appear automatically too, since the app reads the data-center/world list live.
+marketable list.
 
 ---
 
