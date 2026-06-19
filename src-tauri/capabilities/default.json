@@ -20,7 +20,7 @@
     },
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://xivapi.com/*" }]
+      "allow": [{ "url": "https://v2.xivapi.com/*" }, { "url": "https://xivapi.com/*" }]
     }
   ]
 }

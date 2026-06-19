@@ -12,8 +12,9 @@ export const config = {
   universalisBase: 'https://universalis.app/api/v2',
 
   // --- XIVAPI (item icons, fetched lazily then cached to disk) ---
-  // VERIFY the live icon URL format when wiring this up (v1 xivapi.com vs v2.xivapi.com).
-  xivapiIconBase: 'https://xivapi.com',
+  // Use v2: the old v1 (xivapi.com) is frozen and 404s newer items' icons; v2 has them all
+  // (verified June 2026) and sends CORS *. URL shape: /api/asset?path=ui/icon/<f>/<file>.tex&format=png
+  xivapiIconBase: 'https://v2.xivapi.com',
 
   // --- FFXIV Wiki (right-click "View on wiki") ---
   wikiBase: 'https://ffxiv.consolegameswiki.com',
