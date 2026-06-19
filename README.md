@@ -4,7 +4,7 @@
 hand), and Lub's Cart tells you the cheapest way to buy everything across the worlds you can
 reach — grouped by data center and world, with a running total.
 
-Great for big projects like housing pre-builds (This is for your Mitchell)
+Great for big projects like housing pre-builds that use RMP (This is for you Mitchell).
 
 ---
 
