@@ -15,6 +15,8 @@ export const config = {
   // Use v2: the old v1 (xivapi.com) is frozen and 404s newer items' icons; v2 has them all
   // (verified June 2026) and sends CORS *. URL shape: /api/asset?path=ui/icon/<f>/<file>.tex&format=png
   xivapiIconBase: 'https://v2.xivapi.com',
+  // XIVAPI v2 sheet API (Crafting tab — recipe lookups). Same host as icons, sends CORS *.
+  xivapiSheetBase: 'https://v2.xivapi.com/api',
 
   // --- FFXIV Wiki (right-click "View on wiki") ---
   wikiBase: 'https://ffxiv.consolegameswiki.com',
@@ -69,7 +71,7 @@ export const config = {
   hiddenDcRegions: ['NA-Cloud-DC'] as readonly string[],
 
   // --- App version (compare against status.json.latestVersion to show "update available") ---
-  appVersion: '1.0.1',
+  appVersion: '1.1.0',
 } as const;
 
 export type AppConfig = typeof config;

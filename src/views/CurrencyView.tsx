@@ -1,5 +1,5 @@
-// Currency tool (SPEC v1.1 §5): best item to buy-and-flip per end-game currency. Pick one of
-// your selected currencies → the tab loads its flippable items, prices them on your home world
+// Currency tool (SPEC v1.1 §5): best items to buy for gil with an end-game currency. Pick one
+// of your selected currencies → the tab loads its buyable items, prices them on your home world
 // (current listing + sale velocity), and ranks them by gil-per-currency / sales-per-day.
 
 import { useEffect, useMemo, useState } from "react";
@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ItemIcon } from "@/components/ItemIcon";
 import { ItemLabel } from "@/components/ItemLabel";
+import { CurrencySelectDialog } from "@/components/CurrencySelectDialog";
 import { useCurrencies } from "@/state/CurrencyProvider";
 import { useSettings } from "@/state/SettingsProvider";
 import { useAppData } from "@/state/AppDataProvider";
@@ -93,13 +94,22 @@ function useFlipData(currencyId: number | null, worldId: number | null): LoadSta
   return state;
 }
 
-function EmptyState({ title, children }: { title: string; children: React.ReactNode }) {
+function EmptyState({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center p-4">
       <div className="flex max-w-sm flex-col items-center gap-3 rounded-2xl border border-dashed bg-card/40 p-8 text-center">
         <Coins className="size-8 text-muted-foreground" />
         <h2 className="text-base font-medium">{title}</h2>
         <p className="text-sm text-muted-foreground">{children}</p>
+        {action}
       </div>
     </div>
   );
@@ -114,6 +124,7 @@ export function CurrencyView() {
   const [activeId, setActiveId] = useState<number | null>(null);
   const [sort, setSort] = useState<FlipSort>("gil-per-currency");
   const [hideRarelySold, setHideRarelySold] = useState(true);
+  const [selectOpen, setSelectOpen] = useState(false);
 
   // Default the active currency to the first selected; keep it valid as selections change.
   useEffect(() => {
@@ -148,25 +159,31 @@ export function CurrencyView() {
     [budget, visibleRows, data.status],
   );
 
+  let body: React.ReactNode;
   if (selectedCurrencies.length === 0) {
-    return (
-      <EmptyState title="No currencies selected">
-        Open the settings <span className="font-medium">cog</span> (top left) →{" "}
-        <span className="font-medium">Select currencies</span> to choose which end-game
-        currencies to track (Bicolor Gemstones, Cosmocredits, Scrips…).
+    body = (
+      <EmptyState
+        title="No currencies selected"
+        action={
+          <Button size="sm" onClick={() => setSelectOpen(true)}>
+            <Coins className="size-3.5" />
+            Select currencies
+          </Button>
+        }
+      >
+        Choose which end-game currencies to track (Bicolor Gemstones, Cosmocredits, Scrips…)
+        and enter how much of each you have.
       </EmptyState>
     );
-  }
-  if (homeWorld === null) {
-    return (
+  } else if (homeWorld === null) {
+    body = (
       <EmptyState title="Set your home world">
         Pick your <span className="font-medium">Home World</span> in the header — sell prices
         come from the world your retainers list on.
       </EmptyState>
     );
-  }
-
-  return (
+  } else {
+    body = (
     <div className="flex min-h-0 flex-1 flex-col gap-3 p-4">
       {/* Currency chips */}
       <div className="flex flex-wrap items-center gap-2">
@@ -187,6 +204,16 @@ export function CurrencyView() {
             </Button>
           );
         })}
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className="gap-1.5 text-muted-foreground"
+          onClick={() => setSelectOpen(true)}
+        >
+          <Coins className="size-3.5" />
+          Select currencies
+        </Button>
       </div>
 
       {/* Sub-header: what we're showing */}
@@ -288,7 +315,7 @@ export function CurrencyView() {
             Capped to ~{config.budgetSellHorizonDays} days of sales per item, so the list is
             something you can actually move.
             {plan.leftover > 0 &&
-              ` ${plan.leftover.toLocaleString()} ${activeCurrency.name} left unspent — not enough demand to flip more this fast.`}
+              ` ${plan.leftover.toLocaleString()} ${activeCurrency.name} left unspent — not enough demand to sell more this fast.`}
           </p>
         </div>
       )}
@@ -351,7 +378,7 @@ export function CurrencyView() {
                   <tr>
                     <td colSpan={6} className="px-3 py-8 text-center text-sm text-muted-foreground">
                       {rows.length === 0
-                        ? "No flippable items found."
+                        ? "No items found to buy with this currency."
                         : "All items are below the sales/day filter — turn off “Hide rarely sold” to see them."}
                     </td>
                   </tr>
@@ -362,5 +389,13 @@ export function CurrencyView() {
         )}
       </section>
     </div>
+    );
+  }
+
+  return (
+    <>
+      {body}
+      <CurrencySelectDialog open={selectOpen} onClose={() => setSelectOpen(false)} />
+    </>
   );
 }

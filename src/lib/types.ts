@@ -82,6 +82,24 @@ export interface CurrencyExchangeItem {
   receiveQty: number; // units received per exchange
 }
 
+// --- Crafting (v1.1 Crafting tab — SPEC v1.1 §4) ---
+
+/** One ingredient line of a recipe. */
+export interface RecipeIngredient {
+  itemId: number;
+  name: string;
+  icon: number; // icon id (resolved via the shared item-icon cache)
+  amount: number; // units needed per craft
+}
+
+/** A crafting recipe, normalized from XIVAPI v2 (RecipeLookup → Recipe). */
+export interface Recipe {
+  itemId: number; // the crafted (result) item
+  recipeId: number; // the XIVAPI Recipe row id
+  resultQty: number; // units yielded per craft
+  ingredients: RecipeIngredient[];
+}
+
 /** Home-world price + sale-velocity stats for one quality (from Universalis /aggregated). */
 export interface QualityStats {
   minPrice: number | null; // current lowest listing on the home world

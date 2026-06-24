@@ -5,7 +5,14 @@
 // (The Crafting tab's craft-vs-buy math will share this module in B2.)
 
 import { config } from "@/config";
-import type { AggregatedPrice, CurrencyExchangeItem } from "@/lib/types";
+import { computeResult, type PriceableItem } from "@/lib/cheapest";
+import type {
+  AggregatedPrice,
+  CurrencyExchangeItem,
+  MarketData,
+  Recipe,
+  Result,
+} from "@/lib/types";
 
 export interface FlipRow {
   itemId: number;
@@ -32,6 +39,12 @@ export type FlipSort = "gil-per-currency" | "sales-per-day";
 /** Drop troll/cap listings (sellers park items just under the gil cap) so they don't win. */
 function sane(price: number | null): number | null {
   return price !== null && price < config.junkPriceThreshold ? price : null;
+}
+
+/** Home-world unit sale price for an item: junk-filtered min listing, else recent average. */
+function saleUnitPrice(agg: AggregatedPrice | undefined): number | null {
+  if (!agg) return null;
+  return sane(agg.nq.minPrice ?? agg.hq.minPrice ?? null) ?? agg.nq.avgSalePrice ?? agg.hq.avgSalePrice ?? null;
 }
 
 /**
@@ -147,5 +160,81 @@ export function optimizeBudget(
     totalGil: allocations.reduce((s, a) => s + a.gil, 0),
     totalSpent: budget - remaining,
     leftover: remaining,
+  };
+}
+
+// --- Crafting: craft-vs-buy + craft-and-sell (SPEC v1.1 §4.3) ---
+
+export interface CraftAnalysis {
+  craftQty: number; // how many crafts (batches) the figures are for
+  finishedQty: number; // total finished units = resultQty × craftQty
+  /** Cheapest-buy breakdown of the ingredients across the reachable DC (reuses the cart). */
+  ingredients: Result;
+  craftCost: number; // total to buy all ingredients (with buy tax)
+  buyCost: number | null; // cheapest to just buy the finished item (with tax); null if unlisted
+  /** Fraction saved by crafting vs buying: (buyCost − craftCost) / buyCost. */
+  savingsPct: number | null;
+  sellUnitPrice: number | null; // home-world sale price per finished unit
+  sellRevenue: number | null; // sellUnitPrice × finishedQty, after sell tax
+  craftAndSellProfit: number | null; // sellRevenue − craftCost
+  salesPerDay: number | null; // home-world velocity of the finished item
+}
+
+const totalCost = (r: Result) => r.grandTotalPreTax + r.grandTotalTax;
+
+/**
+ * Compare buying an item's ingredients (cheapest across the reachable DC) against buying the
+ * finished item, and against crafting it to sell on the home world. Reuses the cart's
+ * `computeResult` for ingredient pricing, so the breakdown shows exactly where to buy each.
+ */
+export function analyzeCraft(args: {
+  recipe: Recipe;
+  finished: { name: string; icon?: number };
+  craftQty: number;
+  market: MarketData;
+  worldToDc: Map<string, string>;
+  homeWorldPrice: AggregatedPrice | undefined; // finished item, on the home world
+}): CraftAnalysis {
+  const { recipe, finished, craftQty, market, worldToDc, homeWorldPrice } = args;
+  const finishedQty = recipe.resultQty * craftQty;
+
+  const ingredientItems: PriceableItem[] = recipe.ingredients.map((ing) => ({
+    itemId: ing.itemId,
+    itemName: ing.name,
+    icon: ing.icon,
+    qty: ing.amount * craftQty,
+    hqOnly: false,
+  }));
+  const ingredients = computeResult({ items: ingredientItems, market, worldToDc, strategy: "lowest-gil" });
+  const craftCost = totalCost(ingredients);
+
+  // Cheapest way to just buy the finished item (same engine); null if nothing's listed.
+  const buyResult = computeResult({
+    items: [{ itemId: recipe.itemId, itemName: finished.name, icon: finished.icon, qty: finishedQty, hqOnly: false }],
+    market,
+    worldToDc,
+    strategy: "lowest-gil",
+  });
+  const buyOutcome = buyResult.itemOutcomes[0];
+  const buyCost = buyOutcome && buyOutcome.acquired > 0 ? totalCost(buyResult) : null;
+  const savingsPct = buyCost !== null && buyCost > 0 ? (buyCost - craftCost) / buyCost : null;
+
+  const sellUnitPrice = saleUnitPrice(homeWorldPrice);
+  const sellRevenue =
+    sellUnitPrice !== null ? sellUnitPrice * finishedQty * (1 - config.sellTaxRate) : null;
+  const craftAndSellProfit = sellRevenue !== null ? sellRevenue - craftCost : null;
+  const salesPerDay = homeWorldPrice?.nq.salesPerDay ?? homeWorldPrice?.hq.salesPerDay ?? null;
+
+  return {
+    craftQty,
+    finishedQty,
+    ingredients,
+    craftCost,
+    buyCost,
+    savingsPct,
+    sellUnitPrice,
+    sellRevenue,
+    craftAndSellProfit,
+    salesPerDay,
   };
 }

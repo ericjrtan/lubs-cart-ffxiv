@@ -94,6 +94,12 @@ export function GlobalHeader() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [homeDc, dataCenters, worldsById]);
 
+  // value→label map so the trigger shows the world *name*, not its numeric id.
+  const homeWorldItems = useMemo(
+    () => Object.fromEntries(homeWorlds.map((w) => [String(w.id), w.name])),
+    [homeWorlds],
+  );
+
   // Keep home world consistent with home DC: clear it if it no longer belongs to the DC.
   useEffect(() => {
     if (homeWorld !== null && !homeWorlds.some((w) => w.id === homeWorld)) {
@@ -143,8 +149,9 @@ export function GlobalHeader() {
             Home World
           </Label>
           <Select
-            value={homeWorld !== null ? String(homeWorld) : ""}
+            value={homeWorld !== null ? String(homeWorld) : null}
             onValueChange={(v) => setHomeWorld(v ? Number(v) : null)}
+            items={homeWorldItems}
           >
             <SelectTrigger id="home-world" className="w-36" disabled={!homeDc || homeWorlds.length === 0}>
               <SelectValue placeholder="Select…" />

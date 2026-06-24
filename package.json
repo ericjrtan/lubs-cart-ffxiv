@@ -1,12 +1,13 @@
 {
   "name": "lubs-cart",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "build:items": "node scripts/build-items.mjs",
+    "build:currencies": "node scripts/build-currencies.mjs",
     "preview": "vite preview",
     "tauri": "tauri"
   },

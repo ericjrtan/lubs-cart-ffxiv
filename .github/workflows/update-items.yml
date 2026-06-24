@@ -1,7 +1,8 @@
-name: Update item data
+name: Update item & currency data
 
-# Keeps public/items.json current with new FFXIV items — no app rebuild needed.
-# Runs weekly, and can be triggered by hand from the Actions tab (workflow_dispatch).
+# Keeps public/items.json.gz and public/currencies/* current with new FFXIV items and
+# currencies — no app rebuild needed. Runs weekly, and can be triggered by hand from the
+# Actions tab (workflow_dispatch).
 
 on:
   schedule:
@@ -12,7 +13,7 @@ permissions:
   contents: write               # allows the bot commit below (uses the built-in GITHUB_TOKEN)
 
 jobs:
-  update-items:
+  update-data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,18 +27,20 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
-      - name: Regenerate items.json.gz
-        run: node scripts/build-items.mjs
+      - name: Regenerate item + currency data
+        run: |
+          node scripts/build-items.mjs        # writes public/items.json.gz
+          node scripts/build-currencies.mjs   # reads items.json.gz, writes public/currencies/*
 
       - name: Commit if changed
         run: |
-          if [[ -n "$(git status --porcelain public/items.json.gz)" ]]; then
+          if [[ -n "$(git status --porcelain public/items.json.gz public/currencies)" ]]; then
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add public/items.json.gz
-            git commit -m "chore: refresh items.json.gz ($(date -u +%Y-%m-%d))"
+            git add public/items.json.gz public/currencies
+            git commit -m "chore: refresh item + currency data ($(date -u +%Y-%m-%d))"
             git push
-            echo "items.json.gz updated."
+            echo "Item/currency data updated."
           else
-            echo "No changes to items.json.gz."
+            echo "No changes to item/currency data."
           fi

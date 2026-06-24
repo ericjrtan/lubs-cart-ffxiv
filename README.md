@@ -1,8 +1,14 @@
 # 🛒 Lub's Cart
 
-**An unofficial FFXIV market-board shopping tool.** Paste a list of items (or build one by
-hand), and Lub's Cart tells you the cheapest way to buy everything across the worlds you can
-reach — grouped by data center and world, with a running total.
+**An unofficial FFXIV market-board toolkit.** Three tools in one window:
+
+- **🛒 Cart** — paste a shopping list (or build one by hand) and get the cheapest way to buy
+  everything across the worlds you can reach, grouped by data center and world.
+- **🔨 Crafting** — pick a craftable item and see whether buying its components is cheaper
+  than buying it outright, plus the profit if you craft it and sell on your own world.
+- **🪙 Currency** — for an end-game currency (Bicolor Gemstones, Cosmocredits, Scrips…), see
+  which items give the most gil per unit sold on your world, plus a "spend what I have for
+  the most gil" shopping plan.
 
 Great for big projects like housing pre-builds that use RMP (This is for you Mitchell).
 
@@ -24,13 +30,32 @@ Great for big projects like housing pre-builds that use RMP (This is for you Mit
 
 ## ✨ Features
 
+### 🛒 Cart — cheapest shopping list
 - Paste `Item Name: qty` lists (tolerant of typos and other formats) or add items manually.
 - Cheapest-buy across all worlds you can reach, with a **regional-travel** toggle.
 - Two strategies: **lowest total gil** or **fewest stops** — your choice.
 - Totals shown **with and without** market tax.
 - Results grouped by **Data Center → World**, with a copy-list button per world.
-- Item icons + right-click **"View on FFXIV Wiki"** + hover preview.
 - Saved baskets for reusing big lists.
+
+### 🔨 Crafting — craft vs. buy
+- Search any craftable item; recipes are pulled live from XIVAPI.
+- Compares **craft cost** (cheapest components across your data center) against **buy cost**,
+  and shows the **% you'd save** by crafting.
+- **Craft-and-sell profit** if you sell the result on your home world, with how fast it sells.
+- Full "buy these components here" breakdown, reusing the Cart engine.
+
+### 🪙 Currency — best items to buy for gil
+- **Auto-discovers** every end-game currency with sellable rewards (Bicolor Gemstones,
+  Cosmocredits, Scrips, Sacks of Nuts, MGP, beast-tribe currencies…) — new ones appear by
+  themselves as patches add them.
+- Ranks the items a currency can buy by **gil per currency** or **sales per day**, priced on
+  **your** world (where your retainers sell). Troll/cap-price and rarely-sold listings filtered out.
+- **Budget plan:** enter how much you hold → a shopping list that maximises gil, capped to
+  ~a week of sales so you can actually move it.
+- **Click-to-copy prices** as clean numbers for the market-board sell window.
+
+Shared everywhere: item icons, right-click **"View on FFXIV Wiki"**, and hover previews.
 
 ---
 
@@ -42,9 +67,10 @@ already on most Windows machines).
 
 ```bash
 npm install
-npm run build:items      # generate public/items.json.gz (item name -> id table)
-npm run tauri dev        # run the app in dev mode
-npm run tauri build      # produce the distributable .exe / installer
+npm run build:items       # generate public/items.json.gz (item name -> id table)
+npm run build:currencies  # generate public/currencies/* (run AFTER build:items)
+npm run tauri dev         # run the app in dev mode
+npm run tauri build       # produce the distributable .exe / installer
 ```
 
 
@@ -52,10 +78,12 @@ npm run tauri build      # produce the distributable .exe / installer
 
 ## 🔄 How item data stays current
 
-The item table (`public/items.json.gz`) is regenerated automatically by a scheduled GitHub
-Action ([`.github/workflows/update-items.yml`](./.github/workflows/update-items.yml)) from
+The item table (`public/items.json.gz`) and the currency exchange tables
+(`public/currencies/`) are regenerated automatically by a scheduled GitHub Action
+([`.github/workflows/update-items.yml`](./.github/workflows/update-items.yml)) from
 [xivapi/ffxiv-datamining](https://github.com/xivapi/ffxiv-datamining) + the Universalis
-marketable list.
+marketable list. New items and currencies appear on next launch with no rebuild; recipes are
+fetched live from XIVAPI on demand.
 
 ---
 
