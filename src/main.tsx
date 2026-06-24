@@ -4,6 +4,7 @@ import App from "./App";
 import { AppDataProvider } from "@/state/AppDataProvider";
 import { ItemsProvider } from "@/state/ItemsProvider";
 import { SettingsProvider } from "@/state/SettingsProvider";
+import { CurrencyProvider } from "@/state/CurrencyProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./index.css";
 
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <SettingsProvider>
         <AppDataProvider>
           <ItemsProvider>
-            <App />
+            <CurrencyProvider>
+              <App />
+            </CurrencyProvider>
           </ItemsProvider>
         </AppDataProvider>
       </SettingsProvider>

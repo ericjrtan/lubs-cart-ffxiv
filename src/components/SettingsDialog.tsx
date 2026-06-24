@@ -1,5 +1,6 @@
 // Settings popover (SPEC §11): app/data info. Plain panel + backdrop (no portalled dialog)
-// to match BasketMenu and stay click-safe.
+// to match BasketMenu and stay click-safe. General app info only — currency selection lives
+// in the Currency tab (where it's actually used), not here.
 //
 // Icons are loaded as native <img> and cached by the webview automatically (XIVAPI sends a
 // 1-year Cache-Control), so there's no separate icon cache to clear.
