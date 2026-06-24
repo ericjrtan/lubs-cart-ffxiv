@@ -98,6 +98,9 @@ Lub's Cart is built on the work of the FFXIV community — please support these 
 - **App logo & UI theme:** original artwork made for Lub's Cart (no Square Enix assets).
 
 ---
+## AI USAGE
+
+Lub's Cart definetely used AI.
 
 ## ⚖️ Disclaimer
 
