@@ -2,7 +2,7 @@
 // shares — Home DC, regional travel, the reachable-set badge, and the data-freshness chip.
 // Tool-specific controls (cart strategy/Generate, etc.) live in each view's own action bar.
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -70,9 +70,9 @@ function FreshnessChip() {
 }
 
 export function GlobalHeader() {
-  const { dataCenters, status } = useAppData();
-  const { settings, setHomeDc, setTravel, setActiveTab } = useSettings();
-  const { homeDc, travelAllowed, activeTab } = settings;
+  const { dataCenters, worldsById, status } = useAppData();
+  const { settings, setHomeDc, setHomeWorld, setTravel, setActiveTab } = useSettings();
+  const { homeDc, homeWorld, travelAllowed, activeTab } = settings;
   const groups = useMemo(() => groupByRegion(dataCenters), [dataCenters]);
 
   const reachableDcs = useMemo(
@@ -83,6 +83,23 @@ export function GlobalHeader() {
     () => getReachableWorldIds(reachableDcs).length,
     [reachableDcs],
   );
+
+  // The worlds the user can sell on = the worlds of their home DC, by name (SPEC v1.1 §3.3).
+  const homeWorlds = useMemo(() => {
+    const home = dataCenters.find((dc) => dc.name === homeDc);
+    if (!home) return [];
+    return home.worlds
+      .map((id) => worldsById.get(id))
+      .filter((w): w is NonNullable<typeof w> => Boolean(w))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [homeDc, dataCenters, worldsById]);
+
+  // Keep home world consistent with home DC: clear it if it no longer belongs to the DC.
+  useEffect(() => {
+    if (homeWorld !== null && !homeWorlds.some((w) => w.id === homeWorld)) {
+      setHomeWorld(null);
+    }
+  }, [homeWorld, homeWorlds, setHomeWorld]);
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-3">
@@ -116,6 +133,27 @@ export function GlobalHeader() {
                     </SelectItem>
                   ))}
                 </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Label htmlFor="home-world" className="text-xs text-muted-foreground">
+            Home World
+          </Label>
+          <Select
+            value={homeWorld !== null ? String(homeWorld) : ""}
+            onValueChange={(v) => setHomeWorld(v ? Number(v) : null)}
+          >
+            <SelectTrigger id="home-world" className="w-36" disabled={!homeDc || homeWorlds.length === 0}>
+              <SelectValue placeholder="Select…" />
+            </SelectTrigger>
+            <SelectContent>
+              {homeWorlds.map((w) => (
+                <SelectItem key={w.id} value={String(w.id)}>
+                  {w.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>

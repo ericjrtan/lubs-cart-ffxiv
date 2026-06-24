@@ -17,19 +17,28 @@ import type { BasketItem } from "@/hooks/useBasket";
 
 export interface Settings {
   homeDc: string | null;
+  /** World id where the user's retainers sell — the only place sell prices matter (v1.1). */
+  homeWorld: number | null;
   travelAllowed: boolean;
   strategy: Strategy;
   tolerance: number;
   /** Last-open tab, so the app reopens where the user left off (SPEC v1.1 §3.1). */
   activeTab: AppTab;
+  /** Currency ids the user picked to show in the Currency tab (SPEC v1.1 §5.1). */
+  selectedCurrencies: number[];
+  /** How much of each currency the user holds, keyed by currency id — drives the budget plan. */
+  currencyBudgets: Record<number, number>;
 }
 
 const DEFAULTS: Settings = {
   homeDc: null,
+  homeWorld: null,
   travelAllowed: false,
   strategy: "lowest-gil",
   tolerance: 0.1,
   activeTab: "cart",
+  selectedCurrencies: [],
+  currencyBudgets: {},
 };
 
 export interface SavedBasket {
@@ -42,10 +51,13 @@ interface SettingsContextValue {
   settings: Settings;
   ready: boolean;
   setHomeDc: (dc: string | null) => void;
+  setHomeWorld: (id: number | null) => void;
   setTravel: (on: boolean) => void;
   setStrategy: (s: Strategy) => void;
   setTolerance: (t: number) => void;
   setActiveTab: (t: AppTab) => void;
+  setSelectedCurrencies: (ids: number[]) => void;
+  setCurrencyBudget: (id: number, amount: number) => void;
   savedBaskets: SavedBasket[];
   saveBasket: (name: string, items: BasketItem[]) => void;
   getBasket: (name: string) => SavedBasket | undefined;
@@ -94,10 +106,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       settings,
       ready,
       setHomeDc: (homeDc) => patch({ homeDc }),
+      setHomeWorld: (homeWorld) => patch({ homeWorld }),
       setTravel: (travelAllowed) => patch({ travelAllowed }),
       setStrategy: (strategy) => patch({ strategy }),
       setTolerance: (tolerance) => patch({ tolerance }),
       setActiveTab: (activeTab) => patch({ activeTab }),
+      setSelectedCurrencies: (selectedCurrencies) => patch({ selectedCurrencies }),
+      setCurrencyBudget: (id, amount) =>
+        patch({ currencyBudgets: { ...settings.currencyBudgets, [id]: amount } }),
       savedBaskets,
       saveBasket: (name, items) =>
         persistBaskets(

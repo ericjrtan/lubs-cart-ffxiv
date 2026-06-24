@@ -55,6 +55,48 @@ export interface MarketData {
 /** Top-level app tabs (v1.1 — SPEC v1.1 §3.1). */
 export type AppTab = "cart" | "crafting" | "currency";
 
+// --- Currency exchange (v1.1 Currency tab — SPEC v1.1 §5) ---
+
+/** One discoverable currency (from public/currencies/index.json). */
+export interface CurrencyMeta {
+  id: number; // the currency's own item id
+  name: string;
+  icon: number; // icon id (resolved through the shared item-icon cache)
+  itemCount: number; // how many marketable items it can buy (for sort + display)
+}
+
+/** The currency index — auto-generated, lists every currency with flippable items. */
+export interface CurrencyIndex {
+  version: string;
+  generatedAt: string;
+  count: number;
+  currencies: CurrencyMeta[];
+}
+
+/** One flippable exchange (from public/currencies/<currencyId>.json). */
+export interface CurrencyExchangeItem {
+  itemId: number; // the item you receive (and can resell)
+  name: string;
+  icon: number;
+  costQty: number; // units of the currency paid
+  receiveQty: number; // units received per exchange
+}
+
+/** Home-world price + sale-velocity stats for one quality (from Universalis /aggregated). */
+export interface QualityStats {
+  minPrice: number | null; // current lowest listing on the home world
+  avgSalePrice: number | null; // recent average realized sale price
+  salesPerDay: number | null; // daily sale velocity (how fast it moves)
+}
+
+/** Aggregated home-world market stats for one item (SPEC v1.1 §5.3). */
+export interface AggregatedPrice {
+  itemId: number;
+  nq: QualityStats;
+  hq: QualityStats;
+  uploadTime: number | null; // newest world upload time (epoch ms), for staleness
+}
+
 // --- Cheapest-buy results (SPEC §7 / §8) ---
 
 export type Strategy = "lowest-gil" | "fewest-stops";
