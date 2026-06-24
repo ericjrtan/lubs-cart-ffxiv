@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react";
 import { getValue, setValue } from "@/lib/persist";
-import type { Strategy } from "@/lib/types";
+import type { AppTab, Strategy } from "@/lib/types";
 import type { BasketItem } from "@/hooks/useBasket";
 
 export interface Settings {
@@ -20,6 +20,8 @@ export interface Settings {
   travelAllowed: boolean;
   strategy: Strategy;
   tolerance: number;
+  /** Last-open tab, so the app reopens where the user left off (SPEC v1.1 §3.1). */
+  activeTab: AppTab;
 }
 
 const DEFAULTS: Settings = {
@@ -27,6 +29,7 @@ const DEFAULTS: Settings = {
   travelAllowed: false,
   strategy: "lowest-gil",
   tolerance: 0.1,
+  activeTab: "cart",
 };
 
 export interface SavedBasket {
@@ -42,6 +45,7 @@ interface SettingsContextValue {
   setTravel: (on: boolean) => void;
   setStrategy: (s: Strategy) => void;
   setTolerance: (t: number) => void;
+  setActiveTab: (t: AppTab) => void;
   savedBaskets: SavedBasket[];
   saveBasket: (name: string, items: BasketItem[]) => void;
   getBasket: (name: string) => SavedBasket | undefined;
@@ -93,6 +97,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setTravel: (travelAllowed) => patch({ travelAllowed }),
       setStrategy: (strategy) => patch({ strategy }),
       setTolerance: (tolerance) => patch({ tolerance }),
+      setActiveTab: (activeTab) => patch({ activeTab }),
       savedBaskets,
       saveBasket: (name, items) =>
         persistBaskets(

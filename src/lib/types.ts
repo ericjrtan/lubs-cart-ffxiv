@@ -52,6 +52,9 @@ export interface MarketData {
   requestCount: number;
 }
 
+/** Top-level app tabs (v1.1 — SPEC v1.1 §3.1). */
+export type AppTab = "cart" | "crafting" | "currency";
+
 // --- Cheapest-buy results (SPEC §7 / §8) ---
 
 export type Strategy = "lowest-gil" | "fewest-stops";
