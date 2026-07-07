@@ -39,6 +39,7 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add public/items.json.gz public/currencies
             git commit -m "chore: refresh item + currency data ($(date -u +%Y-%m-%d))"
+            git pull --rebase origin main
             git push
             echo "Item/currency data updated."
           else
